@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  release:
+    types: [ published ]
+
+env:
+  CHART_NAME: "grafana-pdc-agent"
+  OCI_URL: "oci://ghcr.io/smartsquaregmbh/helm"
+  VERSION: ${{ github.event.release.tag_name }}
+
+permissions:
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+        id: install
+        with:
+          version: "latest"
+
+      - name: Registry-Login Helm
+        run: |
+          helm registry login $REGISTRY -u $USERNAME -p $PASSWORD
+        env:
+          REGISTRY: ghcr.io
+          USERNAME: ${{ github.actor }}
+          PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package Helm
+        id: package
+        run: |
+          helm package . --version $VERSION
+          echo "package=${CHART_NAME}-${VERSION}.tgz" >> "$GITHUB_OUTPUT"
+
+      - name: Push Helm
+        id: push
+        run: |
+          helm push $PACKAGE $OCI_URL
+        env:
+          PACKAGE: ${{ steps.package.outputs.package }}

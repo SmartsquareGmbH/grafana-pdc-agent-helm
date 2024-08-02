@@ -1,0 +1,32 @@
+# The minimal values-file looks like this - everything else can be omitted:
+#
+# secret:
+#   values:
+#     token: "<YOUR-GRAFANA-TOKEN>"
+#     hostedgrafanaid: "<YOUR-HOSTED-GRAFANA-ID>"
+#     cluster: "<YOUR-GRAFANA-CLUSTER>"
+
+agent:
+  replicaCount: 1
+  image:
+    pullPolicy: Always
+    tag: ""
+  resources:
+    limits:
+      memory: 1Gi
+    requests:
+      cpu: 1
+      memory: 1Gi
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  deployment:
+    extraLabels: {}
+  pod:
+    extraLabels: {}
+secret:
+  name: ""
+  values:
+    token: "CHANGEME"
+    hostedgrafanaid: "CHANGEME"
+    cluster: "CHANGEME"

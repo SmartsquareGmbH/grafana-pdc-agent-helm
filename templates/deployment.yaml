@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-pdc-agent
+  labels:
+    {{- $deploymentLabels := dict "app" "grafana-pdc-agent" "name" "grafana-pdc-agent" }}
+    {{- if .Values.agent }}
+    {{- $deploymentLabels := .Values.agent | dig "deployment" "extraLabels" dict | merge $deploymentLabels }}
+    {{- end }}
+    {{- $deploymentLabels | toYaml | nindent 4 }}
+spec:
+  {{- if .Values.agent }}
+  replicas: {{ .Values.agent | dig "replicaCount" 1 }}
+  {{- else }}
+  replicas: 1
+  {{- end }}
+  selector:
+    matchLabels:
+      name: grafana-pdc-agent
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        {{- $podLabels := dict "name" "grafana-pdc-agent" }}
+        {{- if .Values.agent }}
+        {{- $podLabels := .Values.agent | dig "pod" "extraLabels" dict | merge $podLabels }}
+        {{- end }}
+        {{- $podLabels | toYaml | nindent 8 }}
+    spec:
+      containers:
+      - name: grafana-pdc-agent
+        env:
+        - name: TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: token
+              name: {{ .Values.secret.name | default "grafana-pdc-agent" }}
+        - name: CLUSTER
+          valueFrom:
+            secretKeyRef:
+              key: cluster
+              name: {{ .Values.secret.name | default "grafana-pdc-agent" }}
+        - name: HOSTED_GRAFANA_ID
+          valueFrom:
+            secretKeyRef:
+              key: hosted-grafana-id
+              name: {{ .Values.secret.name | default "grafana-pdc-agent" }}
+        args:
+        - -cluster
+        - $(CLUSTER)
+        - -token
+        - $(TOKEN)
+        - -gcloud-hosted-grafana-id
+        - "$(HOSTED_GRAFANA_ID)"
+        {{- if .Values.agent }}
+        image: "grafana/pdc-agent:{{ .Values.agent | dig "image" "tag" .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.agent | dig "image" "pullPolicy" "Always" }}
+        {{- else}}
+        image: "grafana/pdc-agent:{{ .Chart.AppVersion }}"
+        imagePullPolicy: Always
+        {{- end}}
+        {{- with .Values.agent }}
+        {{- with .resources }}
+        resources:
+          {{- toYaml . | nindent 12 }}
+        {{- end }}
+        {{- end }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          privileged: false
+          runAsNonRoot: true
+          capabilities:
+            drop:
+              - all
+      securityContext:
+        runAsUser: 30000
+        runAsGroup: 30000
+        fsGroup: 30000
+      {{- with .Values.agent }}
+      {{- with .nodeSelector}}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      {{- with .Values.agent }}
+      {{- with .affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      {{- with .Values.agent }}
+      {{- with .tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
