@@ -33,5 +33,5 @@ secret:
 
 # Chart compability
 
-This chart is confirmed to work with grafana-pdc-versions `v0.0.30` and `v0.0.31` but every version prior should work too.
+This chart is confirmed to work with grafana-pdc-versions `v0.0.30` to `v0.0.37` but every version prior should work too.
 
