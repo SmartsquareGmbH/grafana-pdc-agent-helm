@@ -3,5 +3,5 @@ name: grafana-pdc-agent
 description: Grafana Private Datasource Connect Agent
 
 type: application
-version: 0.1.0
+version: 0.2.0
 appVersion: "0.0.37"

@@ -18,7 +18,7 @@ $ helm registry login ghcr.io
 Helm currently does not support adding OCI-registries as Helm-repositories. So use this chart like this:
 
 ```
-$ helm install <release> oci://ghcr.io/smartsquaregmbh/helm/grafana-pdc-agent --version 0.1.0 -f path/to/values.yaml
+$ helm install <release> oci://ghcr.io/smartsquaregmbh/helm/grafana-pdc-agent --version 0.2.0 -f path/to/values.yaml
 ```
 
 Minimal required values.yaml (for all possible values see [values.yaml](./values.yaml)):
