@@ -9,6 +9,12 @@ If you know what your doing just start using this chart from our OCI-registry:
 
 This chart is stored in a OCI-based registry. Please either use Helm v3.8.0+ or consult the [Helm documentation](https://helm.sh/docs/topics/registries) for how to use OCI-registries in older versions.
 
+Make sure you are authenticated against ghcr.io via a [github-pat](https://github.com/settings/tokens) with scope `package:read` using (this will prompt username & token):
+
+```
+$ helm registry login ghcr.io
+```
+
 Helm currently does not support adding OCI-registries as Helm-repositories. So use this chart like this:
 
 ```
